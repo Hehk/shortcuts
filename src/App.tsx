@@ -1,49 +1,118 @@
-import { createSignal } from "solid-js";
-import logo from "./assets/logo.svg";
+import { For, JSX, createEffect, createSignal } from "solid-js";
 import { invoke } from "@tauri-apps/api/tauri";
+import { register, isRegistered } from "@tauri-apps/api/globalShortcut";
 import "./App.css";
 
-function App() {
-  const [greetMsg, setGreetMsg] = createSignal("");
-  const [name, setName] = createSignal("");
+type Action =
+  | {
+      kind: "openApp";
+      path: string;
+    }
+  | {
+      kind: "script";
+      command: string;
+    };
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name: name() }));
+type Keybind = {
+  id: string;
+  shortcut: string;
+  action: Action;
+};
+
+function Action({ action }: { action: Action }): JSX.Element {
+  switch (action.kind) {
+    case "openApp":
+      return <span>Open {action.path}</span>;
+    case "script":
+      return <span>Run {action.command}</span>;
   }
+}
+
+const defaultKeybinds: Keybind[] = [
+  {
+    id: "greet",
+    shortcut: "Ctrl+1",
+    action: {
+      kind: "openApp",
+      path: "/Applications/Arc.app",
+    },
+  },
+  {
+    id: "openApp",
+    shortcut: "Ctrl+2",
+    action: {
+      kind: "openApp",
+      path: "/Applications/Visual Studio Code.app",
+    },
+  },
+  {
+    id: "openApp",
+    shortcut: "Ctrl+3",
+    action: {
+      kind: "openApp",
+      path: "/Applications/Warp.app",
+    },
+  },
+  {
+    id: "openApp",
+    shortcut: "Ctrl+4",
+    action: {
+      kind: "openApp",
+      path: "/Applications/LogSeq.app",
+    },
+  },
+  {
+    id: "openApp",
+    shortcut: "Ctrl+5",
+    action: {
+      kind: "openApp",
+      path: "/Applications/Google Chrome.app",
+    },
+  },
+];
+
+function KeybindList() {
+  const [keybinds, setKeybinds] = createSignal<Keybind[]>(defaultKeybinds);
+
+  createEffect(() => {
+    keybinds().forEach(async (keybind) => {
+      if (await isRegistered(keybind.shortcut)) {
+        return;
+      }
+
+      await register(keybind.shortcut, () => {
+        switch (keybind.action.kind) {
+          case "openApp":
+            invoke("open_app", { path: keybind.action.path });
+            break;
+          case "script":
+            invoke("runScript", { command: keybind.action.command });
+            break;
+        }
+      });
+    });
+  });
+
+  return (
+    <For each={keybinds()}>
+      {(keybind) => (
+        <div>
+          <span>{keybind.shortcut}</span>
+          <Action action={keybind.action} />
+        </div>
+      )}
+    </For>
+  );
+}
+
+function App() {
+  const [name, setName] = createSignal("");
 
   return (
     <div class="container">
       <h1>Welcome to Tauri!</h1>
 
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={logo} class="logo solid" alt="Solid logo" />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-
-      <div class="row">
-        <div>
-          <input
-            id="greet-input"
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="Enter a name..."
-          />
-          <button type="button" onClick={() => greet()}>
-            Greet
-          </button>
-        </div>
-      </div>
-
-      <p>{greetMsg()}</p>
+      <KeybindList />
     </div>
   );
 }
