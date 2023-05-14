@@ -4,12 +4,6 @@
 use anyhow::Result;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem};
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tauri::command]
 async fn open_app(path: &str) -> Result<(), String> {
     let path = std::path::Path::new(path);
@@ -55,15 +49,13 @@ fn main() {
             },
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![greet, open_app])
+        .invoke_handler(tauri::generate_handler![open_app])
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
                 event.window().hide().unwrap();
             }
-            _ => {
-                println!("Window event: {:?}", event.event())
-            }
+            _ => {}
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
