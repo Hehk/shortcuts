@@ -96,7 +96,7 @@ function KeybindList() {
   return (
     <For each={keybinds()}>
       {(keybind) => (
-        <div>
+        <div class="">
           <span>{keybind.shortcut}</span>
           <Action action={keybind.action} />
         </div>
@@ -106,12 +106,8 @@ function KeybindList() {
 }
 
 function App() {
-  const [name, setName] = createSignal("");
-
   return (
-    <div class="container">
-      <h1>Welcome to Tauri!</h1>
-
+    <div class="p-2 font-sans">
       <KeybindList />
     </div>
   );
