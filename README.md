@@ -1,7 +1,5 @@
-# Tauri + Solid + Typescript
+# Shortcut manager for macos
 
-This template should help get you started developing with Tauri, Solid and Typescript in Vite.
+I want to switch apps with a shortcut, so I made this.
 
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+WIP...
