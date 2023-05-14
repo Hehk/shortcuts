@@ -12,14 +12,16 @@
   },
   "tauri": {
     "systemTray": {
-      "iconPath": "icons/icon.ico",
+      "iconPath": "icons/shortcut.ico",
       "iconAsTemplate": true
     },
     "allowlist": {
-      "all": false,
+      "window": {
+        "all": true
+      },
       "shell": {
         "all": false,
-        "open": true
+        "execute": true
       },
       "globalShortcut": {
         "all": true
